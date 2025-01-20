@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pst.rdcrms.entity.UserEntity;
+import com.pst.rdcrms.request.ChangePasswordRequest;
+import com.pst.rdcrms.response.ChangePasswordResponse;
 import com.pst.rdcrms.response.UserResponse;
 import com.pst.rdcrms.service.UserService;
 
@@ -23,32 +25,37 @@ import com.pst.rdcrms.service.UserService;
 public class UserController {
 	
 	@Autowired
-	private UserService service;
+	private UserService userService;
 
 	@PostMapping("/add-user")
 	public UserResponse addUser(@RequestBody UserEntity user) {
-		return service.addUser(user);
+		return userService.addUser(user);
 	}
 
 	@GetMapping("/all-users")
 	public List<UserResponse> viewAllUsers() {
-		return service.getAllUsers();
+		return userService.getAllUsers();
 	}
 
 	@DeleteMapping("/delete-user/{aadhaarNumber}")
 	public String deleteUser(@PathVariable long aadhaarNumber) {
-		return service.deleteUser(aadhaarNumber);
+		return userService.deleteUser(aadhaarNumber);
 	}
 
 	@PutMapping("/update-user/{aadhaarNumber}")
 	public UserResponse updateUser(@PathVariable long aadhaarNumber, @RequestBody UserEntity user) {
 		user.setAadhaarNumber(aadhaarNumber);
-		return service.addUser(user);
+		return userService.addUser(user);
 	}
 
 	@GetMapping("/{aadhaarNumber}")
 	public UserResponse getUserByAadhaarNumber(@PathVariable long aadhaarNumber) {
-		return service.getUserByAadhaarNumber(aadhaarNumber);
+		return userService.getUserByAadhaarNumber(aadhaarNumber);
+	}
+	
+	@PostMapping("/change-password")
+	public ChangePasswordResponse changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+	    return userService.updatePassword(changePasswordRequest);
 	}
 
 }
