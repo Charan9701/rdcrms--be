@@ -9,7 +9,11 @@ import org.springframework.stereotype.Service;
 
 import com.pst.rdcrms.entity.UserEntity;
 import com.pst.rdcrms.repository.UserRepository;
+import com.pst.rdcrms.request.ChangePasswordRequest;
+import com.pst.rdcrms.response.ChangePasswordResponse;
 import com.pst.rdcrms.response.UserResponse;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserService {
@@ -18,6 +22,10 @@ public class UserService {
 	private UserRepository userRepositary;
 
 	private UserResponse userResponse = new UserResponse();
+	
+	Optional<UserEntity> userOptional;
+	
+	private ChangePasswordResponse changePasswordResponse = new ChangePasswordResponse();
 
 	public List<UserResponse> getAllUsers() {
 		List<UserEntity> userEntities = userRepositary.findAll();
@@ -84,7 +92,7 @@ public class UserService {
 	}
 
 	public UserResponse getUserByAadhaarNumber(long aadhaarNumber) {
-		Optional<UserEntity> userOptional = userRepositary.findById(aadhaarNumber);
+		userOptional = userRepositary.findById(aadhaarNumber);
 		if (userOptional.isPresent()) {
 			UserEntity userEntity = userOptional.get();
 
@@ -115,6 +123,27 @@ public class UserService {
 		} else {
 			return null;
 		}
-
+	}
+	
+	@Transactional
+	public ChangePasswordResponse updatePassword(ChangePasswordRequest changePasswordRequest) {
+		UserResponse userResponse = getUserByAadhaarNumber(changePasswordRequest.getAadhaarNumber());
+		if (userResponse != null) {
+			if (userResponse.getPassword().equals(changePasswordRequest.getOldPassword())) {
+				int rowsUpdated = userRepositary.updatePasswordByAadhaarNumber(changePasswordRequest.getNewPassword(),
+						changePasswordRequest.getAadhaarNumber(), changePasswordRequest.getOldPassword());
+				if (rowsUpdated > 0) {
+					changePasswordResponse.setMessage("Password changed successfully.");
+				} else {
+					changePasswordResponse.setMessage("Password update failed. Please check the details.");
+				}
+			} else {
+				changePasswordResponse.setMessage("Old password does not match");
+			}
+		} else {
+			changePasswordResponse
+					.setMessage("User not found");
+		}
+		return changePasswordResponse;
 	}
 }
