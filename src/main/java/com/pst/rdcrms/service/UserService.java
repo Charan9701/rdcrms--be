@@ -23,8 +23,6 @@ public class UserService {
 
 	private UserResponse userResponse = new UserResponse();
 	
-	Optional<UserEntity> userOptional;
-	
 	private ChangePasswordResponse changePasswordResponse = new ChangePasswordResponse();
 
 	public List<UserResponse> getAllUsers() {
@@ -92,7 +90,7 @@ public class UserService {
 	}
 
 	public UserResponse getUserByAadhaarNumber(long aadhaarNumber) {
-		userOptional = userRepositary.findById(aadhaarNumber);
+		Optional<UserEntity>  userOptional = userRepositary.findById(aadhaarNumber);
 		if (userOptional.isPresent()) {
 			UserEntity userEntity = userOptional.get();
 
